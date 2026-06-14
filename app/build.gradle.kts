@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-
     val nav_version = "2.7.5"
     val room = "2.6.0"
 
@@ -46,7 +45,7 @@ dependencies {
 
     // Compose BOM (ONLY ONCE)
     implementation(platform(libs.androidx.compose.bom))
-
+    implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
