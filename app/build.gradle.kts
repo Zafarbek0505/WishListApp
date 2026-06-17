@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.kapt")}
+    alias(libs.plugins.kotlin.compose)
+}
 
 android {
     namespace = "com.example.wishlistapp"
@@ -26,37 +26,41 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    kotlin {
+        jvmToolchain(11)
+    }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-    val nav_version = "2.7.5"
-    val room = "2.6.0"
+    val navVersion = "2.7.7"
+    val roomVersion = "2.6.1"
 
     // Room
-    implementation("androidx.room:room-runtime:$room")
-    implementation("androidx.room:room-ktx:$room")
-    kapt("androidx.room:room-compiler:$room")
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
 
-    // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:$nav_version")
 
-    // Compose BOM (ONLY ONCE)
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Tests
+    // Testing
     testImplementation(libs.junit)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
