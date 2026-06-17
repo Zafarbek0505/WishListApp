@@ -2,41 +2,42 @@ package com.example.wishlistapp
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBarView(
     title: String,
-    onBackNavClickable: () -> Unit = {}
+    onBackNavClickable: (() -> Unit)? = null
 ) {
-    val navigationIcon: (@Composable () -> Unit)? =
-        if (!title.contains("WishList")) {
-            {
-                IconButton(onClick = { onBackNavClickable() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-            }
-        } else {
-            null
-        }
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title,
-                color = colorResource(id = R.color.white)
+                style = MaterialTheme.typography.titleLarge
             )
         },
+        navigationIcon = {
+            if (onBackNavClickable != null) {
+                IconButton(onClick = onBackNavClickable) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colorResource(id = R.color.app_bar_color),
-            titleContentColor = colorResource(id = R.color.white)
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }
