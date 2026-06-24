@@ -2,12 +2,14 @@ package com.example.wishlistapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Indigo90 = Color(0xFFDCE2FF)
-val Sage90 = Color(0xFFD6EAD8)
-val Coral90 = Color(0xFFFFDAD2)
-val Ink10 = Color(0xFF171A21)
-val Mist95 = Color(0xFFF5F7FB)
+val Azure95 = Color(0xFFEAF2FF)
+val Mint90 = Color(0xFFD5F2E3)
+val Coral90 = Color(0xFFFFD7CC)
+val Ink10 = Color(0xFF10141C)
+val Graphite20 = Color(0xFF242936)
+val Mist98 = Color(0xFFFAFBFF)
+val Mist92 = Color(0xFFE9EEF7)
 
-val Indigo40 = Color(0xFF4157B2)
-val Sage40 = Color(0xFF3F7050)
-val Coral40 = Color(0xFFB44B3E)
+val Azure40 = Color(0xFF2366D1)
+val Mint40 = Color(0xFF167455)
+val Coral40 = Color(0xFFBD4D37)

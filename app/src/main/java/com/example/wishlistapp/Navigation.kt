@@ -15,6 +15,8 @@ private const val NewWishId = 0L
 
 @Composable
 fun Navigation(
+    isDarkMode: Boolean,
+    onToggleTheme: () -> Unit,
     viewModel: WishViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
@@ -25,6 +27,8 @@ fun Navigation(
         composable(Screen.HomeScreen.route) {
             HomeView(
                 wishes = viewModel.wishes,
+                isDarkMode = isDarkMode,
+                onToggleTheme = onToggleTheme,
                 onAddWish = {
                     navController.navigate("${Screen.AddEditScreen.route}/$NewWishId")
                 },
@@ -49,6 +53,8 @@ fun Navigation(
 
             AddEditWishView(
                 wish = wish,
+                isDarkMode = isDarkMode,
+                onToggleTheme = onToggleTheme,
                 onBack = { navController.popBackStack() },
                 onSave = { title, description, priority ->
                     viewModel.saveWish(

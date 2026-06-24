@@ -15,7 +15,8 @@ import androidx.compose.runtime.Composable
 @Composable
 fun AppBarView(
     title: String,
-    onBackNavClickable: (() -> Unit)? = null
+    onBackNavClickable: (() -> Unit)? = null,
+    actions: @Composable () -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -34,6 +35,7 @@ fun AppBarView(
                 }
             }
         },
+        actions = { actions() },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
