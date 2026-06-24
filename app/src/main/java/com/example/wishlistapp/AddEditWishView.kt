@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -38,6 +39,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,6 +60,9 @@ fun AddEditWishView(
     onBack: () -> Unit,
     onSave: (title: String, description: String, priority: WishPriority) -> Unit
 ) {
+    val snackMessage = remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
     var title by rememberSaveable(wish?.id) { mutableStateOf(wish?.title.orEmpty()) }
     var description by rememberSaveable(wish?.id) { mutableStateOf(wish?.description.orEmpty()) }
     var priorityName by rememberSaveable(wish?.id) {

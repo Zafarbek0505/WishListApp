@@ -2,11 +2,16 @@ package com.example.wishlistapp
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.wishlistapp.data.DummyWish
 import com.example.wishlistapp.data.Wish
 import com.example.wishlistapp.data.WishPriority
+import com.example.wishlistapp.data.WishRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
-class WishViewModel : ViewModel() {
+class WishViewModel(private val wishRepository: WishRepository) : ViewModel() {
     private val _wishes = mutableStateListOf<Wish>().apply {
         addAll(DummyWish.wishList)
     }
@@ -50,4 +55,31 @@ class WishViewModel : ViewModel() {
     }
 
     private fun nextId(): Long = (_wishes.maxOfOrNull { it.id } ?: 0L) + 1L
+    lateinit var getAllWishes: Flow<List<Wish>>
+
+    init {
+        viewModelScope.launch { getAllWishes = wishRepository.getWishes() }
+    }
+
+    fun addWish(wish: Wish) {
+        viewModelScope.launch(Dispatchers.IO) {
+            wishRepository.addAWish(wish)
+        }
+    }
+
+    fun getAWishById(id: Long): Flow<Wish> {
+        return wishRepository.getWishById(id)
+    }
+
+    fun updateWish(wish: Wish) {
+        viewModelScope.launch(Dispatchers.IO) {
+            wishRepository.updateAWish(wish)
+        }
+    }
+
+    fun deleteWish(wish: Wish) {
+        viewModelScope.launch(Dispatchers.IO) {
+            wishRepository.deleteAWish(wish)
+        }
+    }
 }
