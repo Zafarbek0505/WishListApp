@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -35,7 +37,9 @@ fun CategoriesView(
     currentRoute: String,
     onNavigate: (String) -> Unit
 ) {
-    val grouped = wishes.groupBy { it.category }
+    val categories = remember(wishes) {
+        wishes.groupBy { it.category }.entries.toList()
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -45,7 +49,9 @@ fun CategoriesView(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(start = 18.dp, top = 22.dp, end = 18.dp, bottom = 18.dp),
+            contentPadding = PaddingValues(
+                start = 18.dp, top = 22.dp, end = 18.dp, bottom = 18.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
@@ -59,16 +65,16 @@ fun CategoriesView(
             }
 
             if (wishes.isEmpty()) {
-                item { EmptyTabState(message = "No wishes yet. Add one from Home.") }
+                item {
+                    EmptyTabState(message = "No wishes yet. Add one from Home.")
+                }
             } else {
-                grouped.entries.forEach { (category, categoryWishes) ->
-                    item(key = category) {
-                        CategoryCard(
-                            category = category,
-                            wishes = categoryWishes,
-                            onOpenWish = onOpenWish
-                        )
-                    }
+                items(items = categories, key = { it.key }) { (category, categoryWishes) ->
+                    CategoryCard(
+                        category = category,
+                        wishes = categoryWishes,
+                        onOpenWish = onOpenWish
+                    )
                 }
             }
         }
@@ -115,7 +121,9 @@ private fun CategoryCard(
                 }
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
 
             wishes.forEach { wish ->
                 Row(
@@ -126,14 +134,17 @@ private fun CategoryCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
                         Text(
                             text = wish.title,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Target: $${wish.targetPrice.toInt()}  •  ${wish.status.label}",
+                            text = "Target: \$${wish.targetPrice.toInt()}  •  ${wish.status.label}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
