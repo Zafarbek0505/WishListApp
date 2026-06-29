@@ -47,7 +47,7 @@ fun ProfileView(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(horizontal = 18.dp, top = 22.dp, bottom = 18.dp),
+            contentPadding = PaddingValues(start = 18.dp, top = 22.dp, end = 18.dp, bottom = 18.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
