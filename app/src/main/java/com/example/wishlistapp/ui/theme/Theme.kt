@@ -12,33 +12,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Azure95,
-    secondary = Mint90,
-    tertiary = Coral90,
+    primary = Sage90,
+    secondary = Gold90,
+    tertiary = Burgundy40,
     background = Ink10,
     surface = Graphite20,
-    surfaceVariant = Color(0xFF303747),
-    primaryContainer = Color(0xFF153A75),
-    secondaryContainer = Color(0xFF164A39),
-    tertiaryContainer = Color(0xFF703024),
-    onPrimaryContainer = Color(0xFFD7E4FF),
-    onSecondaryContainer = Color(0xFFD5F2E3),
-    onTertiaryContainer = Color(0xFFFFDAD2)
+    surfaceVariant = Color(0xFF332F27),
+    primaryContainer = Color(0xFF0A4A34),
+    secondaryContainer = Color(0xFF59421D),
+    tertiaryContainer = Color(0xFF6E1823),
+    onPrimaryContainer = Sage90,
+    onSecondaryContainer = Gold90,
+    onTertiaryContainer = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Azure40,
-    secondary = Mint40,
-    tertiary = Coral40,
-    background = Mist98,
-    surface = Color.White,
-    surfaceVariant = Mist92,
-    primaryContainer = Azure95,
-    secondaryContainer = Mint90,
-    tertiaryContainer = Coral90,
-    onPrimaryContainer = Color(0xFF0B2754),
-    onSecondaryContainer = Color(0xFF063725),
-    onTertiaryContainer = Color(0xFF4F170D)
+    primary = Forest30,
+    secondary = Forest45,
+    tertiary = Gold45,
+    background = Cream98,
+    surface = Color(0xFFFFFCF7),
+    surfaceVariant = Linen94,
+    primaryContainer = Sage90,
+    secondaryContainer = Gold90,
+    tertiaryContainer = Color(0xFFF3E0DF),
+    onPrimaryContainer = Color(0xFF073525),
+    onSecondaryContainer = Color(0xFF4A3517),
+    onTertiaryContainer = Burgundy40
 )
 
 @Composable

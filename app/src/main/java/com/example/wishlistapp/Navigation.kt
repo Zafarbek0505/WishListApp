@@ -15,8 +15,6 @@ private const val NewWishId = 0L
 
 @Composable
 fun Navigation(
-    isDarkMode: Boolean,
-    onToggleTheme: () -> Unit,
     viewModel: WishViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
@@ -27,15 +25,12 @@ fun Navigation(
         composable(Screen.HomeScreen.route) {
             HomeView(
                 wishes = viewModel.wishes,
-                isDarkMode = isDarkMode,
-                onToggleTheme = onToggleTheme,
                 onAddWish = {
                     navController.navigate("${Screen.AddEditScreen.route}/$NewWishId")
                 },
-                onEditWish = { wishId ->
-                    navController.navigate("${Screen.AddEditScreen.route}/$wishId")
-                },
-                onDeleteWish = viewModel::deleteWish
+                onOpenWish = { wishId ->
+                    navController.navigate("${Screen.DetailScreen.route}/$wishId")
+                }
             )
         }
 
@@ -53,19 +48,45 @@ fun Navigation(
 
             AddEditWishView(
                 wish = wish,
-                isDarkMode = isDarkMode,
-                onToggleTheme = onToggleTheme,
                 onBack = { navController.popBackStack() },
-                onSave = { title, description, priority ->
+                onSave = { title, description, priority, category, targetPrice, savedAmount, dueDate, reminder ->
                     viewModel.saveWish(
                         id = wish?.id,
                         title = title,
                         description = description,
-                        priority = priority
+                        priority = priority,
+                        category = category,
+                        targetPrice = targetPrice,
+                        savedAmount = savedAmount,
+                        dueDate = dueDate,
+                        reminder = reminder
                     )
                     navController.popBackStack()
                 }
             )
+        }
+
+        composable(
+            route = "${Screen.DetailScreen.route}/{$WishIdArg}",
+            arguments = listOf(navArgument(WishIdArg) { type = NavType.LongType })
+        ) { backStackEntry ->
+            val wishId = backStackEntry.arguments?.getLong(WishIdArg) ?: NewWishId
+            val wish = viewModel.getWish(wishId)
+
+            if (wish == null) {
+                navController.popBackStack()
+            } else {
+                DetailWishView(
+                    wish = wish,
+                    onBack = { navController.popBackStack() },
+                    onEdit = { navController.navigate("${Screen.AddEditScreen.route}/${wish.id}") },
+                    onDelete = {
+                        viewModel.deleteWish(wish.id)
+                        navController.popBackStack(Screen.HomeScreen.route, inclusive = false)
+                    },
+                    onMarkBought = { viewModel.markWishAsBought(wish.id) }
+                )
+            }
         }
     }
 }

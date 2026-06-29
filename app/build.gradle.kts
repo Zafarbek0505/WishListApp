@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
@@ -17,7 +18,12 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -37,12 +43,6 @@ android {
 
 dependencies {
     val navVersion = "2.7.7"
-    val roomVersion = "2.6.1"
-
-    // Room
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:$navVersion")
@@ -62,7 +62,6 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
-    implementation("androidx.compose.material:material")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
