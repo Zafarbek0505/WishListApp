@@ -54,6 +54,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -341,25 +343,34 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
 
 @Composable
 fun WishImageTile(wish: Wish, modifier: Modifier = Modifier) {
-    val gradient = when (wish.imageSeed % 5) {
-        1    -> listOf(Color(0xFF001A80), Color(0xFF0066FF))
-        2    -> listOf(Color(0xFF004060), Color(0xFF00CCFF))
-        3    -> listOf(Color(0xFF2D0066), Color(0xFF9933FF))
-        4    -> listOf(Color(0xFF005533), Color(0xFF00CC96))
-        else -> listOf(Color(0xFF660022), Color(0xFFFF3355))
-    }
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Brush.linearGradient(gradient)),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.Inventory2,
-            contentDescription = null,
-            modifier = Modifier.size(38.dp),
-            tint = Color.White.copy(alpha = 0.9f)
+    if (wish.imageUri.isNotBlank()) {
+        AsyncImage(
+            model = wish.imageUri,
+            contentDescription = wish.title,
+            modifier = modifier.clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
         )
+    } else {
+        val gradient = when (wish.imageSeed % 5) {
+            1    -> listOf(Color(0xFF001A80), Color(0xFF0066FF))
+            2    -> listOf(Color(0xFF004060), Color(0xFF00CCFF))
+            3    -> listOf(Color(0xFF2D0066), Color(0xFF9933FF))
+            4    -> listOf(Color(0xFF005533), Color(0xFF00CC96))
+            else -> listOf(Color(0xFF660022), Color(0xFFFF3355))
+        }
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Brush.linearGradient(gradient)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Inventory2,
+                contentDescription = null,
+                modifier = Modifier.size(38.dp),
+                tint = Color.White.copy(alpha = 0.9f)
+            )
+        }
     }
 }
 

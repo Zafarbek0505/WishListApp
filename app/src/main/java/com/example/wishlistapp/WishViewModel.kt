@@ -29,7 +29,8 @@ class WishViewModel : ViewModel() {
         targetPrice: Double,
         savedAmount: Double,
         dueDate: String,
-        reminder: String
+        reminder: String,
+        imageUri: String = ""
     ) {
         val cleanTitle = title.trim()
         val cleanDescription = description.trim()
@@ -44,15 +45,16 @@ class WishViewModel : ViewModel() {
         if (id == null || id == 0L) {
             addWish(
                 Wish(
-                    title = cleanTitle,
+                    title       = cleanTitle,
                     description = cleanDescription,
-                    priority = priority,
-                    category = cleanCategory,
+                    priority    = priority,
+                    category    = cleanCategory,
                     targetPrice = targetPrice.coerceAtLeast(0.0),
                     savedAmount = savedAmount.coerceIn(0.0, targetPrice.coerceAtLeast(0.0)),
-                    dueDate = cleanDueDate,
-                    reminder = cleanReminder,
-                    imageSeed = (_wishes.size % 5) + 1
+                    dueDate     = cleanDueDate,
+                    reminder    = cleanReminder,
+                    imageSeed   = (_wishes.size % 5) + 1,
+                    imageUri    = imageUri
                 )
             )
             return
@@ -62,14 +64,15 @@ class WishViewModel : ViewModel() {
         if (existing != null) {
             updateWish(
                 existing.copy(
-                    title = cleanTitle,
+                    title       = cleanTitle,
                     description = cleanDescription,
-                    priority = priority,
-                    category = cleanCategory,
+                    priority    = priority,
+                    category    = cleanCategory,
                     targetPrice = targetPrice.coerceAtLeast(0.0),
                     savedAmount = savedAmount.coerceIn(0.0, targetPrice.coerceAtLeast(0.0)),
-                    dueDate = cleanDueDate,
-                    reminder = cleanReminder
+                    dueDate     = cleanDueDate,
+                    reminder    = cleanReminder,
+                    imageUri    = imageUri
                 )
             )
         }

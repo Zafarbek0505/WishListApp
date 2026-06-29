@@ -55,7 +55,7 @@ fun Navigation(
             AddEditWishView(
                 wish = wish,
                 onBack = { navController.popBackStack() },
-                onSave = { title, description, priority, category, targetPrice, savedAmount, dueDate, reminder ->
+                onSave = { title, description, priority, category, targetPrice, savedAmount, dueDate, reminder, imageUri ->
                     viewModel.saveWish(
                         id = wish?.id,
                         title = title,
@@ -65,7 +65,8 @@ fun Navigation(
                         targetPrice = targetPrice,
                         savedAmount = savedAmount,
                         dueDate = dueDate,
-                        reminder = reminder
+                        reminder = reminder,
+                        imageUri = imageUri
                     )
                     navController.popBackStack()
                 }

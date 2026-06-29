@@ -33,7 +33,8 @@ object Graph {
                 dueDate = item.optString("dueDate"),
                 reminder = item.optString("reminder", "1 week before"),
                 status = item.optEnum("status", WishStatus.InProgress),
-                imageSeed = item.optInt("imageSeed", 0)
+                imageSeed = item.optInt("imageSeed", 0),
+                imageUri  = item.optString("imageUri", "")
             )
         }
     }
@@ -54,6 +55,7 @@ object Graph {
                     .put("reminder", wish.reminder)
                     .put("status", wish.status.name)
                     .put("imageSeed", wish.imageSeed)
+                    .put("imageUri",  wish.imageUri)
             )
         }
         preferences().edit().putString(WishesKey, array.toString()).apply()

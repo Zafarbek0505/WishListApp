@@ -1,7 +1,11 @@
 package com.example.wishlistapp
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
@@ -40,9 +45,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.wishlistapp.data.Wish
 import com.example.wishlistapp.data.WishPriority
 
@@ -58,24 +66,43 @@ fun AddEditWishView(
         targetPrice: Double,
         savedAmount: Double,
         dueDate: String,
-        reminder: String
+        reminder: String,
+        imageUri: String
     ) -> Unit
 ) {
-    var title by rememberSaveable(wish?.id) { mutableStateOf(wish?.title.orEmpty()) }
-    var description by rememberSaveable(wish?.id) { mutableStateOf(wish?.description.orEmpty()) }
-    var category by rememberSaveable(wish?.id) { mutableStateOf(wish?.category ?: "Fashion") }
-    var targetPrice by rememberSaveable(wish?.id) {
+    val context = LocalContext.current
+
+    var title        by rememberSaveable(wish?.id) { mutableStateOf(wish?.title.orEmpty()) }
+    var description  by rememberSaveable(wish?.id) { mutableStateOf(wish?.description.orEmpty()) }
+    var category     by rememberSaveable(wish?.id) { mutableStateOf(wish?.category ?: "Fashion") }
+    var targetPrice  by rememberSaveable(wish?.id) {
         mutableStateOf(wish?.targetPrice?.takeIf { it > 0.0 }?.toString().orEmpty())
     }
-    var savedAmount by rememberSaveable(wish?.id) {
+    var savedAmount  by rememberSaveable(wish?.id) {
         mutableStateOf(wish?.savedAmount?.takeIf { it > 0.0 }?.toString().orEmpty())
     }
-    var dueDate by rememberSaveable(wish?.id) { mutableStateOf(wish?.dueDate.orEmpty()) }
-    var reminder by rememberSaveable(wish?.id) { mutableStateOf(wish?.reminder ?: "1 week before") }
+    var dueDate      by rememberSaveable(wish?.id) { mutableStateOf(wish?.dueDate.orEmpty()) }
+    var reminder     by rememberSaveable(wish?.id) { mutableStateOf(wish?.reminder ?: "1 week before") }
     var priorityName by rememberSaveable(wish?.id) {
         mutableStateOf((wish?.priority ?: WishPriority.Medium).name)
     }
+    var imageUri     by rememberSaveable(wish?.id) { mutableStateOf(wish?.imageUri.orEmpty()) }
+
     val selectedPriority = WishPriority.valueOf(priorityName)
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+            imageUri = uri.toString()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -95,12 +122,19 @@ fun AddEditWishView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            UploadImageCard()
+            UploadImageCard(
+                imageUri = imageUri,
+                onClick  = {
+                    imagePicker.launch(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                }
+            )
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                color = MaterialTheme.colorScheme.surface,
+                shape  = RoundedCornerShape(14.dp),
+                color  = MaterialTheme.colorScheme.surface,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
             ) {
                 Column(
@@ -157,7 +191,10 @@ fun AddEditWishView(
                             modifier = Modifier.weight(1f),
                             singleLine = true,
                             trailingIcon = {
-                                Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null)
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = null
+                                )
                             }
                         )
                     }
@@ -185,14 +222,17 @@ fun AddEditWishView(
                         targetPrice.toDoubleOrNull() ?: 0.0,
                         savedAmount.toDoubleOrNull() ?: 0.0,
                         dueDate,
-                        reminder
+                        reminder,
+                        imageUri
                     )
                 },
                 enabled = title.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(vertical = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             ) {
                 Text(text = if (wish == null) "Save Wish" else "Save Changes")
             }
@@ -209,36 +249,70 @@ fun AddEditWishView(
 }
 
 @Composable
-private fun UploadImageCard() {
-    Surface(
-        modifier = Modifier.size(164.dp),
-        shape = RoundedCornerShape(14.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
+private fun UploadImageCard(imageUri: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(164.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Image,
-                contentDescription = null,
-                modifier = Modifier.size(34.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+        if (imageUri.isNotBlank()) {
+            AsyncImage(
+                model = imageUri,
+                contentDescription = "Wish image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-            Text(
-                text = "Upload Image",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Tap to upload",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Overlay edit hint
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.30f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Change image",
+                    modifier = Modifier.size(32.dp),
+                    tint = Color.White
+                )
+            }
+        } else {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Image,
+                        contentDescription = null,
+                        modifier = Modifier.size(34.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Upload Image",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Tap to upload",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }
@@ -271,8 +345,10 @@ private fun WishTextField(
             trailingIcon = trailingIcon,
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                focusedContainerColor   = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedBorderColor      = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor    = MaterialTheme.colorScheme.outlineVariant
             )
         )
         if (supportingText != null) {
@@ -308,23 +384,15 @@ private fun PriorityPanel(
                     onClick = { onPrioritySelected(priority) },
                     label = { Text(text = priority.name) },
                     leadingIcon = if (selectedPriority == priority) {
-                        {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null
-                            )
-                        }
-                    } else {
-                        null
-                    }
+                        { Icon(imageVector = Icons.Default.Check, contentDescription = null) }
+                    } else null
                 )
             }
         }
     }
 }
 
-private fun String.filterPriceInput(): String {
-    return filterIndexed { index, char ->
+private fun String.filterPriceInput(): String =
+    filterIndexed { index, char ->
         char.isDigit() || (char == '.' && indexOf('.') == index)
     }
-}

@@ -11,7 +11,8 @@ data class Wish(
     val dueDate: String = "",
     val reminder: String = "1 week before",
     val status: WishStatus = WishStatus.InProgress,
-    val imageSeed: Int = 0
+    val imageSeed: Int = 0,
+    val imageUri: String = ""
 )
 
 enum class WishPriority {
