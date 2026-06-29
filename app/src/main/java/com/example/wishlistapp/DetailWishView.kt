@@ -44,7 +44,9 @@ fun DetailWishView(
     onBack: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onMarkBought: () -> Unit
+    onMarkBought: () -> Unit,
+    currentRoute: String,
+    onNavigate: (String) -> Unit
 ) {
     val progress = if (wish.targetPrice <= 0.0) 0f else (wish.savedAmount / wish.targetPrice).toFloat().coerceIn(0f, 1f)
 
@@ -55,7 +57,7 @@ fun DetailWishView(
                 onBackNavClickable = onBack
             )
         },
-        bottomBar = { WishBottomBar() },
+        bottomBar = { WishBottomBar(currentRoute = currentRoute, onNavigate = onNavigate) },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(

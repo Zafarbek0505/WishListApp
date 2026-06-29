@@ -18,6 +18,14 @@ fun Navigation(
     viewModel: WishViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    fun navigateToTab(route: String) {
+        navController.navigate(route) {
+            popUpTo(Screen.HomeScreen.route) { saveState = true; inclusive = false }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = Screen.HomeScreen.route
@@ -25,12 +33,10 @@ fun Navigation(
         composable(Screen.HomeScreen.route) {
             HomeView(
                 wishes = viewModel.wishes,
-                onAddWish = {
-                    navController.navigate("${Screen.AddEditScreen.route}/$NewWishId")
-                },
-                onOpenWish = { wishId ->
-                    navController.navigate("${Screen.DetailScreen.route}/$wishId")
-                }
+                onAddWish = { navController.navigate("${Screen.AddEditScreen.route}/$NewWishId") },
+                onOpenWish = { wishId -> navController.navigate("${Screen.DetailScreen.route}/$wishId") },
+                currentRoute = Screen.HomeScreen.route,
+                onNavigate = ::navigateToTab
             )
         }
 
@@ -84,9 +90,37 @@ fun Navigation(
                         viewModel.deleteWish(wish.id)
                         navController.popBackStack(Screen.HomeScreen.route, inclusive = false)
                     },
-                    onMarkBought = { viewModel.markWishAsBought(wish.id) }
+                    onMarkBought = { viewModel.markWishAsBought(wish.id) },
+                    currentRoute = Screen.HomeScreen.route,
+                    onNavigate = ::navigateToTab
                 )
             }
+        }
+
+        composable(Screen.CategoriesScreen.route) {
+            CategoriesView(
+                wishes = viewModel.wishes,
+                onOpenWish = { wishId -> navController.navigate("${Screen.DetailScreen.route}/$wishId") },
+                currentRoute = Screen.CategoriesScreen.route,
+                onNavigate = ::navigateToTab
+            )
+        }
+
+        composable(Screen.RemindersScreen.route) {
+            RemindersView(
+                wishes = viewModel.wishes,
+                onOpenWish = { wishId -> navController.navigate("${Screen.DetailScreen.route}/$wishId") },
+                currentRoute = Screen.RemindersScreen.route,
+                onNavigate = ::navigateToTab
+            )
+        }
+
+        composable(Screen.ProfileScreen.route) {
+            ProfileView(
+                wishes = viewModel.wishes,
+                currentRoute = Screen.ProfileScreen.route,
+                onNavigate = ::navigateToTab
+            )
         }
     }
 }

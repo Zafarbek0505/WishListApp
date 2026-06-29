@@ -63,6 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.wishlistapp.data.Wish
 import com.example.wishlistapp.data.WishPriority
+import com.example.wishlistapp.ui.theme.Screen
 
 private const val AllCategories = "All"
 
@@ -70,7 +71,9 @@ private const val AllCategories = "All"
 fun HomeView(
     wishes: List<Wish>,
     onAddWish: () -> Unit,
-    onOpenWish: (Long) -> Unit
+    onOpenWish: (Long) -> Unit,
+    currentRoute: String = Screen.HomeScreen.route,
+    onNavigate: (String) -> Unit = {}
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var selectedCategory by rememberSaveable { mutableStateOf(AllCategories) }
@@ -100,7 +103,7 @@ fun HomeView(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add wish")
             }
         },
-        bottomBar = { WishBottomBar() }
+        bottomBar = { WishBottomBar(currentRoute = currentRoute, onNavigate = onNavigate) }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -351,12 +354,12 @@ fun PriorityPill(priority: WishPriority) {
 }
 
 @Composable
-fun WishBottomBar() {
+fun WishBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         bottomItems.forEach { item ->
             NavigationBarItem(
-                selected = item.label == "Home",
-                onClick = {},
+                selected = currentRoute == item.route,
+                onClick = { if (currentRoute != item.route) onNavigate(item.route) },
                 icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
                 label = { Text(text = item.label) }
             )
@@ -364,13 +367,13 @@ fun WishBottomBar() {
     }
 }
 
-private data class BottomItem(val label: String, val icon: ImageVector)
+private data class BottomItem(val label: String, val icon: ImageVector, val route: String)
 
 private val bottomItems = listOf(
-    BottomItem("Home", Icons.Default.Home),
-    BottomItem("Categories", Icons.Default.GridView),
-    BottomItem("Reminders", Icons.Default.NotificationsNone),
-    BottomItem("Profile", Icons.Default.PersonOutline)
+    BottomItem("Home", Icons.Default.Home, Screen.HomeScreen.route),
+    BottomItem("Categories", Icons.Default.GridView, Screen.CategoriesScreen.route),
+    BottomItem("Reminders", Icons.Default.NotificationsNone, Screen.RemindersScreen.route),
+    BottomItem("Profile", Icons.Default.PersonOutline, Screen.ProfileScreen.route)
 )
 
 @Composable
