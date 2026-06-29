@@ -1,5 +1,6 @@
 package com.example.wishlistapp
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,23 +21,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -98,7 +95,7 @@ fun HomeView(
                 onClick = onAddWish,
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                contentColor   = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add wish")
             }
@@ -112,12 +109,9 @@ fun HomeView(
             contentPadding = PaddingValues(start = 18.dp, top = 22.dp, end = 18.dp, bottom = 18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            item { HomeHeader(totalWishes = wishes.size) }
+            item { HomeHeader(wishes = wishes) }
             item {
-                SearchField(
-                    query = query,
-                    onQueryChange = { query = it }
-                )
+                SearchField(query = query, onQueryChange = { query = it })
             }
             item {
                 CategoryFilters(
@@ -140,7 +134,7 @@ fun HomeView(
                     )
                     Text(
                         text = "${filteredWishes.size} items",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -154,14 +148,8 @@ fun HomeView(
                     )
                 }
             } else {
-                items(
-                    items = filteredWishes,
-                    key = { it.id }
-                ) { wish ->
-                    WishItem(
-                        wish = wish,
-                        onClick = { onOpenWish(wish.id) }
-                    )
+                items(items = filteredWishes, key = { it.id }) { wish ->
+                    WishItem(wish = wish, onClick = { onOpenWish(wish.id) })
                 }
             }
 
@@ -171,41 +159,47 @@ fun HomeView(
 }
 
 @Composable
-private fun HomeHeader(totalWishes: Int) {
+private fun HomeHeader(wishes: List<Wish>) {
+    val totalSaved  = wishes.sumOf { it.savedAmount }
+    val totalTarget = wishes.sumOf { it.targetPrice }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = {}) {
-            Icon(imageVector = Icons.Default.Tune, contentDescription = "Filters")
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = "WishList",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = if (totalTarget > 0)
+                    "\$${totalSaved.toInt()} saved · \$${totalTarget.toInt()} total"
+                else
+                    "${wishes.size} wishes tracked",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
-        Text(
-            modifier = Modifier.weight(1f),
-            text = "WishList",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.primary
-        )
         Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.tertiaryContainer
+            shape = RoundedCornerShape(10.dp),
+            color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Text(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                text = totalWishes.toString(),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                text = "${wishes.size}",
                 style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }
 }
 
 @Composable
-private fun SearchField(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
+private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
@@ -213,14 +207,18 @@ private fun SearchField(
         singleLine = true,
         shape = RoundedCornerShape(28.dp),
         leadingIcon = {
-            Icon(imageVector = Icons.Default.Search, contentDescription = null)
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         },
         placeholder = { Text(text = "Search your wishes...") },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor   = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent
+            focusedBorderColor      = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor    = MaterialTheme.colorScheme.outlineVariant
         )
     )
 }
@@ -235,12 +233,12 @@ private fun CategoryFilters(
         items(categories) { category ->
             FilterChip(
                 selected = selectedCategory == category,
-                onClick = { onCategorySelected(category) },
-                label = { Text(text = category) },
-                colors = FilterChipDefaults.filterChipColors(
+                onClick  = { onCategorySelected(category) },
+                label    = { Text(text = category) },
+                colors   = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    containerColor = MaterialTheme.colorScheme.surface
+                    selectedLabelColor     = MaterialTheme.colorScheme.onPrimary,
+                    containerColor         = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -248,79 +246,107 @@ private fun CategoryFilters(
 }
 
 @Composable
-fun WishItem(
-    wish: Wish,
-    onClick: () -> Unit
-) {
-    ElevatedCard(
+fun WishItem(wish: Wish, onClick: () -> Unit) {
+    val progress = if (wish.targetPrice > 0.0)
+        (wish.savedAmount / wish.targetPrice).toFloat().coerceIn(0f, 1f)
+    else 0f
+
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+        shape  = RoundedCornerShape(16.dp),
+        color  = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            WishImageTile(
-                wish = wish,
-                modifier = Modifier.size(92.dp)
-            )
+            WishImageTile(wish = wish, modifier = Modifier.size(86.dp))
+
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = wish.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                    )
+                    PriorityPill(priority = wish.priority)
+                }
+
                 Text(
-                    text = wish.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    text = wish.category,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = wish.description.ifBlank { "No description yet" },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+
+                if (wish.description.isNotBlank()) {
+                    Text(
+                        text = wish.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "\$${wish.targetPrice.toInt()}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "${(progress * 100).toInt()}% saved",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    color      = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.outlineVariant
                 )
-                Text(
-                    text = "$${wish.targetPrice.toInt()}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.BookmarkBorder,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                PriorityPill(priority = wish.priority)
             }
         }
     }
 }
 
 @Composable
-fun WishImageTile(
-    wish: Wish,
-    modifier: Modifier = Modifier
-) {
+fun WishImageTile(wish: Wish, modifier: Modifier = Modifier) {
     val gradient = when (wish.imageSeed % 5) {
-        1 -> listOf(Color(0xFFE9D4B8), Color(0xFFC69E62))
-        2 -> listOf(Color(0xFF2D2D2F), Color(0xFF8E8E8E))
-        3 -> listOf(Color(0xFFF4EFE7), Color(0xFF9E6A3B))
-        4 -> listOf(Color(0xFF0D4B34), Color(0xFFB8C9AA))
-        else -> listOf(Color(0xFFEFE6DA), Color(0xFFB99B6B))
+        1    -> listOf(Color(0xFF001A80), Color(0xFF0066FF))
+        2    -> listOf(Color(0xFF004060), Color(0xFF00CCFF))
+        3    -> listOf(Color(0xFF2D0066), Color(0xFF9933FF))
+        4    -> listOf(Color(0xFF005533), Color(0xFF00CC96))
+        else -> listOf(Color(0xFF660022), Color(0xFFFF3355))
     }
     Box(
         modifier = modifier
@@ -331,7 +357,7 @@ fun WishImageTile(
         Icon(
             imageVector = Icons.Outlined.Inventory2,
             contentDescription = null,
-            modifier = Modifier.size(42.dp),
+            modifier = Modifier.size(38.dp),
             tint = Color.White.copy(alpha = 0.9f)
         )
     }
@@ -340,13 +366,13 @@ fun WishImageTile(
 @Composable
 fun PriorityPill(priority: WishPriority) {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(6.dp),
         color = priorityColor(priority)
     ) {
         Text(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             text = priority.name,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
@@ -359,9 +385,9 @@ fun WishBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
         bottomItems.forEach { item ->
             NavigationBarItem(
                 selected = currentRoute == item.route,
-                onClick = { if (currentRoute != item.route) onNavigate(item.route) },
-                icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
-                label = { Text(text = item.label) }
+                onClick  = { if (currentRoute != item.route) onNavigate(item.route) },
+                icon     = { Icon(imageVector = item.icon, contentDescription = item.label) },
+                label    = { Text(text = item.label) }
             )
         }
     }
@@ -370,20 +396,17 @@ fun WishBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
 private data class BottomItem(val label: String, val icon: ImageVector, val route: String)
 
 private val bottomItems = listOf(
-    BottomItem("Home", Icons.Default.Home, Screen.HomeScreen.route),
-    BottomItem("Categories", Icons.Default.GridView, Screen.CategoriesScreen.route),
-    BottomItem("Reminders", Icons.Default.NotificationsNone, Screen.RemindersScreen.route),
-    BottomItem("Profile", Icons.Default.PersonOutline, Screen.ProfileScreen.route)
+    BottomItem("Home",       Icons.Default.Home,              Screen.HomeScreen.route),
+    BottomItem("Categories", Icons.Default.GridView,          Screen.CategoriesScreen.route),
+    BottomItem("Reminders",  Icons.Default.NotificationsNone, Screen.RemindersScreen.route),
+    BottomItem("Profile",    Icons.Default.PersonOutline,     Screen.ProfileScreen.route)
 )
 
 @Composable
-private fun EmptyWishState(
-    hasSearchQuery: Boolean,
-    onAddWish: () -> Unit
-) {
+private fun EmptyWishState(hasSearchQuery: Boolean, onAddWish: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Column(
@@ -403,14 +426,15 @@ private fun EmptyWishState(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = if (hasSearchQuery) "Try another search or category." else "Add something you would love to remember.",
+                text = if (hasSearchQuery) "Try another search or category."
+                       else "Add something you would love to remember.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (!hasSearchQuery) {
                 AssistChip(
                     onClick = onAddWish,
-                    label = { Text(text = "Create first wish") },
+                    label   = { Text(text = "Create first wish") },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                     }
@@ -420,20 +444,18 @@ private fun EmptyWishState(
     }
 }
 
-fun priorityColor(priority: WishPriority): Color {
-    return when (priority) {
-        WishPriority.Low -> Color(0xFF0B4B36)
-        WishPriority.Medium -> Color(0xFFC18431)
-        WishPriority.High -> Color(0xFF9C1F2D)
-    }
+fun priorityColor(priority: WishPriority): Color = when (priority) {
+    WishPriority.Low    -> Color(0xFF00CC96)
+    WishPriority.Medium -> Color(0xFFFFAA00)
+    WishPriority.High   -> Color(0xFFFF3355)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun HomeViewPreview() {
     HomeView(
-        wishes = com.example.wishlistapp.data.DummyWish.wishList,
-        onAddWish = {},
+        wishes     = com.example.wishlistapp.data.DummyWish.wishList,
+        onAddWish  = {},
         onOpenWish = {}
     )
 }

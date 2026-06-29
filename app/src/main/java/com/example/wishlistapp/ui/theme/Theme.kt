@@ -12,39 +12,60 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Sage90,
-    secondary = Gold90,
-    tertiary = Burgundy40,
-    background = Ink10,
-    surface = Graphite20,
-    surfaceVariant = Color(0xFF332F27),
-    primaryContainer = Color(0xFF0A4A34),
-    secondaryContainer = Color(0xFF59421D),
-    tertiaryContainer = Color(0xFF6E1823),
-    onPrimaryContainer = Sage90,
-    onSecondaryContainer = Gold90,
-    onTertiaryContainer = Color.White
+    primary              = NeonBlue,
+    onPrimary            = DeepNavy,
+    primaryContainer     = SlateCard,
+    onPrimaryContainer   = NeonBlue,
+    secondary            = CyberCyan,
+    onSecondary          = DeepNavy,
+    secondaryContainer   = MidnightCard,
+    onSecondaryContainer = CyberCyan,
+    tertiary             = CyberCyan,
+    tertiaryContainer    = Color(0xFF003D55),
+    onTertiaryContainer  = CyberCyan,
+    background           = DeepNavy,
+    onBackground         = Color.White,
+    surface              = SpaceBlue,
+    onSurface            = Color.White,
+    surfaceVariant       = MidnightCard,
+    onSurfaceVariant     = SteelGray,
+    outline              = SlateCard,
+    outlineVariant       = DimBlue,
+    error                = TechRed,
+    onError              = Color.White,
+    errorContainer       = Color(0xFF4A0010),
+    onErrorContainer     = TechRed
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Forest30,
-    secondary = Forest45,
-    tertiary = Gold45,
-    background = Cream98,
-    surface = Color(0xFFFFFCF7),
-    surfaceVariant = Linen94,
-    primaryContainer = Sage90,
-    secondaryContainer = Gold90,
-    tertiaryContainer = Color(0xFFF3E0DF),
-    onPrimaryContainer = Color(0xFF073525),
-    onSecondaryContainer = Color(0xFF4A3517),
-    onTertiaryContainer = Burgundy40
+    primary              = ElectricBlue,
+    onPrimary            = Color.White,
+    primaryContainer     = PowderBlue,
+    onPrimaryContainer   = NavyInk,
+    secondary            = Color(0xFF3A5080),
+    onSecondary          = Color.White,
+    secondaryContainer   = IceBlue,
+    onSecondaryContainer = NavyInk,
+    tertiary             = CyanMuted,
+    tertiaryContainer    = Color(0xFFCCF0FF),
+    onTertiaryContainer  = NavyInk,
+    background           = CloudWhite,
+    onBackground         = NavyInk,
+    surface              = Color.White,
+    onSurface            = NavyInk,
+    surfaceVariant       = IceBlue,
+    onSurfaceVariant     = SteelGray,
+    outline              = Color(0xFFB8C8E8),
+    outlineVariant       = PowderBlue,
+    error                = TechRed,
+    onError              = Color.White,
+    errorContainer       = Color(0xFFFFD9DF),
+    onErrorContainer     = Color(0xFF7A0020)
 )
 
 @Composable
 fun WishListAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -53,14 +74,13 @@ fun WishListAppTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else      -> LightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        typography  = Typography,
+        content     = content
     )
 }
